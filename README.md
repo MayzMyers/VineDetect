@@ -19,6 +19,9 @@
 
 Linux или WSL2, Python 3.11+, Docker Engine с Compose v2 и поддержкой `gpus: all`, NVIDIA GPU и совместимый драйвер CUDA 13. Текущий Core использует CUDA и не имеет проверенного CPU-only режима. Для Core выделяются 4 CPU и 6 GiB RAM; всему стеку и сборке требуется дополнительная память. Модели и дескрипторы занимают значительное место на диске.
 
+## Архитектура ядра сервиса распознавания
+[docs/recognize-core-architecture.md](docs/recognize-core-architecture.md)
+
 ## Запуск
 
 ```bash
