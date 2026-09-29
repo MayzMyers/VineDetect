@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Courier New", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.font-display {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+@keyframes recognition-sheet-enter {
+  from {
+    opacity: 0;
+    transform: translateY(105%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.recognition-sheet-enter {
+  animation: recognition-sheet-enter 440ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recognition-sheet-enter {
+    animation: none;
+  }
+}
+
+@keyframes recognition-token-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.recognition-token-pop {
+  animation: recognition-token-pop 280ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes scanner-hint-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.scanner-hint-enter {
+  animation: scanner-hint-enter 260ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes scanner-intro-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scanner-intro-leave {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-105%);
+  }
+}
+
+.scanner-intro-enter {
+  animation: scanner-intro-enter 260ms ease-out both;
+}
+
+.scanner-intro-leave {
+  pointer-events: none;
+  animation: scanner-intro-leave 420ms cubic-bezier(.55, 0, .25, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanner-intro-enter,
+  .scanner-intro-leave,
+  .scanner-hint-enter {
+    animation-duration: 1ms;
+  }
+}
+
+html,
+body {
+  overscroll-behavior: none;
+}
+
+video {
+  transform: translateZ(0);
+}

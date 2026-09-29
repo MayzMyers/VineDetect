@@ -1,0 +1,101 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-wines}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-wines}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    image: postgres:16
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - ./migrations:/migrations:ro
+    command:
+      - sh
+      - -c
+      - |
+        set -eu
+        psql -v ON_ERROR_STOP=1 \
+          -h postgres \
+          -U ${POSTGRES_USER:-postgres} \
+          -d ${POSTGRES_DB:-wines} \
+          -c "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())"
+        for file in /migrations/[0-9][0-9][0-9]_*.sql; do
+          version=$$(basename "$$file" .sql)
+          applied=$$(psql -tA \
+            -h postgres \
+            -U ${POSTGRES_USER:-postgres} \
+            -d ${POSTGRES_DB:-wines} \
+            -c "SELECT 1 FROM schema_migrations WHERE version = '$$version'")
+          if [ "$$applied" = "1" ]; then
+            echo "Skipping already applied migration $$version"
+            continue
+          fi
+          echo "Applying migration $$version"
+          psql -v ON_ERROR_STOP=1 \
+            -h postgres \
+            -U ${POSTGRES_USER:-postgres} \
+            -d ${POSTGRES_DB:-wines} \
+            -f "$$file"
+          psql -v ON_ERROR_STOP=1 \
+            -h postgres \
+            -U ${POSTGRES_USER:-postgres} \
+            -d ${POSTGRES_DB:-wines} \
+            -c "INSERT INTO schema_migrations (version) VALUES ('$$version')"
+        done
+    restart: "no"
+
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - path: ${API_ENV_FILE:-.env}
+        required: false
+        format: raw
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-wines}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    command:
+      [
+        "uvicorn",
+        "app.api.application:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5).read()\""
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:

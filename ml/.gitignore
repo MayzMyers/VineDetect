@@ -1,0 +1,10 @@
+﻿# Keep ML downloads, weights, arrays and experiments out of Git.
+.cache/
+.checkpoints/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.npy
+*.npz
+artifacts/

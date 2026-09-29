@@ -1,0 +1,8 @@
+{
+  "runtime": "core-runtime",
+  "docker_archive": "frozen-environment.tar",
+  "database_dump": "database.dump",
+  "asset_store": "asset-store",
+  "annotation_gallery": "annotation-gallery",
+  "supplemental": "supplemental"
+}

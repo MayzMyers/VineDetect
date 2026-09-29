@@ -1,0 +1,268 @@
+{
+  "schema_version": "assistant-media-review/1",
+  "basis": "Manual visual review of all provided contact sheets plus review-data evidence.",
+  "summary": {
+    "ambiguous_items_reviewed": 31,
+    "ambiguous_selected": 31,
+    "ambiguous_still_unresolved": 0,
+    "missing_manual_fallbacks": 5,
+    "practical_resolved_if_accepted": 2103,
+    "catalog_items": 2103
+  },
+  "ambiguous_recommendations": [
+    {
+      "official_slug": "aratti-shardone-beloe-suhoe",
+      "recommended_relative_path": "Shardone_dc6ec8d1cb.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "Only C07 is the ARATTI Chardonnay bottle; other candidates are unrelated grapes/sparkling assets."
+    },
+    {
+      "official_slug": "bukovinka",
+      "recommended_relative_path": "Screenshot_10_a566dcdabb.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C02 is the TABIA Bukovinka bottle; C01 is an event banner."
+    },
+    {
+      "official_slug": "czitronnyj-magaracha",
+      "recommended_relative_path": "Screenshot_20_74ce4e5bae.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C02 is the TABIA Citron bottle; C01 is a venue/landscape image."
+    },
+    {
+      "official_slug": "glera-manno",
+      "recommended_relative_path": "Screenshot_2_66036870aa.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C01 is the Manno Glera bottle; other candidates are unrelated imagery."
+    },
+    {
+      "official_slug": "grand-jete-blanc-de-blancs",
+      "recommended_relative_path": "output_img_021_f1012524c8.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "All three rendered candidates depict Grand Jete Blanc de Blancs. Selected the highest-resolution candidate."
+    },
+    {
+      "official_slug": "grand-jete-cuvee",
+      "recommended_relative_path": "output_img_023_d18d2e4a64.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "Both rendered candidates depict Grand Jete Cuvee. Selected the slightly higher-resolution candidate."
+    },
+    {
+      "official_slug": "kaberne-sovinon-2",
+      "recommended_relative_path": "Screenshot_19_081d41ebac.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "C01 and C02 depict the same TABIA Cabernet Sauvignon bottle; C03 is unrelated. Selected the cleaner white-background candidate."
+    },
+    {
+      "official_slug": "krasnostop-zolotovskij",
+      "recommended_relative_path": "krasnostop_cca9e0b43e.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C02 is the Krasnostop Zolotovsky bottle; C01 is a grape photo."
+    },
+    {
+      "official_slug": "lesnaya-proseka",
+      "recommended_relative_path": "Screenshot_4_7c7945f9a9.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C02 is the Lesnaya Proseka bottle; C01/C03 are unrelated scene images."
+    },
+    {
+      "official_slug": "magnatum-blanc-de-blancs",
+      "recommended_relative_path": "2_8fdb34dcf3.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C05 is the Magnatum Blanc de Blancs bottle; other candidates are unrelated assets."
+    },
+    {
+      "official_slug": "merlo",
+      "recommended_relative_path": "merlo_d6c03313e4.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "Winery is Galitsky & Galitsky; C02 is their Merlot, while C01 is Mantra Estate."
+    },
+    {
+      "official_slug": "merlo-1",
+      "recommended_relative_path": "merlo_89592556f7.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "Winery is Mantra Estate; C01 is their Merlot."
+    },
+    {
+      "official_slug": "oleg",
+      "recommended_relative_path": "Screenshot_9_78adaf4455.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C03 is the TABIA Oleg bottle; other candidates are event banners."
+    },
+    {
+      "official_slug": "pino-nuar",
+      "recommended_relative_path": "pino_nuar_4915dc36a6.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C05 is the Galitsky & Galitsky Pinot Noir bottle; other candidates are grapes or unrelated sparkling bottle."
+    },
+    {
+      "official_slug": "pobeda",
+      "recommended_relative_path": "Screenshot_7_53531eb2bc.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C03 is the TABIA Pobeda bottle; others are unrelated imagery."
+    },
+    {
+      "official_slug": "polusladkoe-krasnoe-zb-vajn-frizzante",
+      "recommended_relative_path": "Frizante_krasnoe_polusladkoe_67706f9516.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "Both candidates depict the same ZB Frizzante semi-sweet red bottle. Selected the larger-byte candidate."
+    },
+    {
+      "official_slug": "polusladkoe-krasnoe-zolotaya-balka",
+      "recommended_relative_path": "Polusladkoe_krasnoe_b2776e879a.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "high",
+      "note": "Both candidates depict the same Zolotaya Balka semi-sweet red bottle. Selected b2776e879a as canonical reference after direct visual review."
+    },
+    {
+      "official_slug": "polusuhoe-rozovoe-zb-vajn-frizzante",
+      "recommended_relative_path": "ZB_Frizzante_Rose_Semidry_813124d39d.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "Both candidates depict the same ZB Frizzante Rose Semidry bottle. Selected the slightly larger-byte candidate."
+    },
+    {
+      "official_slug": "pozdnij-sbor-beloe",
+      "recommended_relative_path": "Screenshot_21_049bbb796f.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "high",
+      "note": "C01/C02 are byte-identical and depict the correct bottle; C03 is unrelated. Selected canonical C01."
+    },
+    {
+      "official_slug": "pozdnij-sbor-krasnoe",
+      "recommended_relative_path": "Screenshot_22_1b291bec0e.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C01 is the Pozdniy Sbor bottle; C02 is an unrelated event image."
+    },
+    {
+      "official_slug": "risling",
+      "recommended_relative_path": "risling_86f49d6fb2.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C03 is the Galitsky & Galitsky Riesling bottle; C01/C02 are grape photos."
+    },
+    {
+      "official_slug": "risling-1",
+      "recommended_relative_path": "Screenshot_11_a9d7c8f8df.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C01 is the TABIA Riesling bottle; C02/C03 are event graphics."
+    },
+    {
+      "official_slug": "roze-2",
+      "recommended_relative_path": "Screenshot_17_6d600742f0.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C01 is the TABIA Rosé bottle; C02/C03 are unrelated images."
+    },
+    {
+      "official_slug": "rozovoe-zoloto",
+      "recommended_relative_path": "Screenshot_16_a237793391.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C01 is the TABIA Rozovoe Zoloto bottle; C02 is unrelated."
+    },
+    {
+      "official_slug": "rubin-golodrigi",
+      "recommended_relative_path": "Screenshot_18_1109114bb0.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C01 is the TABIA Rubin Golodrigi bottle; C02/C03 are unrelated."
+    },
+    {
+      "official_slug": "rustok-glera-ru-140",
+      "recommended_relative_path": "Screenshot_3_dce2afc6e1.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C03 is the Rootstock Glera RU 140 bottle; C01/C02 are unrelated."
+    },
+    {
+      "official_slug": "sovinon-blan-krasnaya-gorka",
+      "recommended_relative_path": "sov_blan_c03a466980.webp",
+      "review_class": "confirmed_visual",
+      "confidence": "high",
+      "note": "C02 is the Galitsky & Galitsky Sauvignon Blanc bottle; C01 is botanical art."
+    },
+    {
+      "official_slug": "suhoe-beloe-zb-vajn-frizzante",
+      "recommended_relative_path": "Frizante_beloe_suhoe_1efeefdc54.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "All candidates depict the same ZB Frizzante dry white bottle; C01 and C04 are byte-identical. Selected canonical C01."
+    },
+    {
+      "official_slug": "vibes-silvaner-barrel-fermented-2022",
+      "recommended_relative_path": "03_Silvaner_2022_Barrel_Fermented_01addc1e7f.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "All candidates depict the same VIBES Silvaner 2022 bottle; C01/C02 are byte-identical. Selected canonical C01."
+    },
+    {
+      "official_slug": "zhemchuzhnaya-9-aligote-czitron",
+      "recommended_relative_path": "Aligote_Czitron_bel_suh_1cc2763d35.webp",
+      "review_class": "manual_equivalent",
+      "confidence": "medium",
+      "note": "Both candidates depict Aligote/Citron. Selected canonical C01."
+    },
+    {
+      "official_slug": "zhemchuzhnaya-9-czitron-shardone",
+      "recommended_relative_path": "Aligote_Czitron_bel_suh_1cc2763d35.webp",
+      "review_class": "source_preserving_shared",
+      "confidence": "medium",
+      "note": "Organizer CSV gives the same photo_name as the Aligote/Citron item. The rendered image label appears Aligote/Citron despite this item's Citron/Chardonnay title. Preserve the organizer-provided shared photo mapping and flag the catalog inconsistency."
+    }
+  ],
+  "missing_recommendations": [
+    {
+      "official_slug": "fanagoriya-fanagoriya-hey-bey-shardone-beloe-suhoe-13",
+      "recommended_relative_path": "f_Kq_In_Kw3d7b_LF_Oe_Fn_M_Gnh_Ktuh_Vl_Vjof_M3_Qaag_F_Bw_K_Wmvlyd_Gu_Q_Cp8tk_DOW_Pz1_Jf_Pnx7c_HG_Dn_X_Wt_Q_y1y7_Xu_Mfg0e_I_Qs5g_Tmt8_XG_4on_i36r8npum_ZHI_4mid_Pd_Whec_Nq_412368f0b0.webp",
+      "review_class": "manual_historical_fallback",
+      "confidence": "medium",
+      "note": "Exact historical wine link exists and this historical asset basename is present in the official archive. Use as manual fallback; organizer photo_name does not deterministically resolve."
+    },
+    {
+      "official_slug": "katharon-mezenka-risling-polusuhoe",
+      "recommended_relative_path": "IMG_20260617_132406_315_dc183ec137.webp",
+      "review_class": "manual_historical_fallback",
+      "confidence": "high",
+      "note": "Exact historical wine link exists and the historical asset is present in the official archive."
+    },
+    {
+      "official_slug": "katharon-mezenka-risling-suhoe",
+      "recommended_relative_path": "IMG_20260617_132401_890_e3ce77f247.webp",
+      "review_class": "manual_historical_fallback",
+      "confidence": "high",
+      "note": "Exact historical wine link exists and the historical asset is present in the official archive."
+    },
+    {
+      "official_slug": "leto-kaberne-fran-2021-suhoe-krasnoe",
+      "recommended_relative_path": "Vino_suhoe_krasnoe_KABERNE_FRAN_3c69650ca3.webp",
+      "review_class": "manual_historical_fallback",
+      "confidence": "high",
+      "note": "Exact historical wine link and archive asset exist. Filename omits vintage year, so keep provenance as manual fallback rather than deterministic normalization."
+    },
+    {
+      "official_slug": "vinodelnya-vedernikov-vedernikov-tsimlyanskiy-chyornyy-tsimlyanskiy-chernyy-krasnoe-suhoe-14",
+      "recommended_relative_path": "f_Kq_In_Kw3d7b_LF_Oe_Fn_M_Gnh_Lwyz_Yv_B_J0l_a_Gu_P9_ZF_Xxs3w_BR_5_ETC_Fr5mq_RB_9_Vo_Fg_It8d5h6_B_or_Hdxex_T8_Tw4cw_OQ_5x0g_Q_Yny_Gw_Sca_Gr8npum_ZHI_4mid_Pd_Whec_Nq_1854d79859.webp",
+      "review_class": "manual_historical_fallback",
+      "confidence": "medium",
+      "note": "Exact historical wine link exists and this historical asset basename is present in the official archive. Keep manual provenance because organizer filename does not resolve."
+    }
+  ]
+}

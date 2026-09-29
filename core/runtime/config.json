@@ -1,0 +1,23 @@
+{
+  "dino_weight": 0.5,
+  "fusion_offset": 60,
+  "geometry_enabled": true,
+  "kd": 20,
+  "kl": 15,
+  "ko": 3,
+  "ks": 20,
+  "label_min_confidence": 0.2,
+  "label_min_score": 0.55,
+  "label_weight": 0.15,
+  "max_pool_size": 0,
+  "ocr_min_idf": 0.45,
+  "reference_cache_size": 32,
+  "retrieval_depth": 30,
+  "weights": [
+    1.0,
+    0.6,
+    0.0,
+    0.6,
+    0.05
+  ]
+}

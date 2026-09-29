@@ -1,0 +1,383 @@
+name: vinedetect-public
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-wines}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup.py}
+    ports:
+    - 127.0.0.1:${POSTGRES_PORT:-5432}:5432
+    volumes:
+    - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+  dataset-check:
+    image: postgres:16
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: ${POSTGRES_DB:-wines}
+      PGUSER: ${POSTGRES_USER:-postgres}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup.py}
+    command:
+    - sh
+    - -ec
+    - "ready=\"$$(psql -tA -c \"SELECT\n  to_regclass('svoe_vino.wines') IS NOT NULL\n\
+      \  AND to_regclass('svoe_vino.wine_images') IS NOT NULL\n  AND to_regclass('roskachestvo.products')\
+      \ IS NOT NULL\")\"\nif [ \"$$ready\" != \"t\" ]; then\n  echo \"Restored dataset\
+      \ schema is missing. Run scripts/restore_dataset.sh first.\" >&2\n  exit 1\n\
+      fi\necho \"Restored dataset schema is ready.\"\n"
+    restart: 'no'
+  api:
+    build:
+      context: ./vinedetect_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      dataset-check:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Run
+        scripts/setup.py}@postgres:5432/${POSTGRES_DB:-wines}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?Set ADMIN_PASSWORD_HASH in the root
+        .env file}
+      ANNOTATOR_USERNAME: ${ANNOTATOR_USERNAME:-annotator}
+      ANNOTATOR_PASSWORD_HASH: ${ANNOTATOR_PASSWORD_HASH:-}
+      ML_SERVICE_USERNAME: ${ML_SERVICE_USERNAME:-ml-service}
+      ML_SERVICE_PASSWORD_HASH: ${ML_SERVICE_PASSWORD_HASH:-}
+      JWT_SECRET: ${JWT_SECRET:?Run scripts/setup.py}
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-480}
+      CORS_ORIGINS: ${WEB_ORIGIN:-http://127.0.0.1:3000},http://localhost:3000
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      STATIC_ASSETS_ROOT: /data/assets
+      STATIC_ASSETS_URL_PREFIX: /static/images
+      PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-http://127.0.0.1:8000}
+    ports:
+    - 127.0.0.1:${API_PORT:-8000}:8000
+    volumes:
+    - ./asset-store:/data/assets:ro
+    - ./vinedetect_api/data:/app/data:ro
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',
+        timeout=5).read()"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+  recognize-migrate:
+    build:
+      context: ./recognize-service
+      target: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      dataset-check:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Run
+        scripts/setup.py}@postgres:5432/${POSTGRES_DB:-wines}
+    command:
+    - node
+    - dist/db/migrate.js
+    restart: 'no'
+    profiles:
+    - annotation
+  annotation-controller:
+    build:
+      context: ./annotation_controller
+    environment:
+      PORT: 9000
+      CONTROLLER_TOKEN: ${LOCAL_ML_CONTROLLER_TOKEN:-}
+    ports:
+    - 127.0.0.1:${ANNOTATION_CONTROLLER_PORT:-9000}:9000
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - node -e "fetch('http://127.0.0.1:9000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    profiles:
+    - annotation
+  llm-controller:
+    build:
+      context: ./annotation_controller
+    environment:
+      PORT: 9100
+      CONTROLLER_BACKEND: ${LLM_CONTROLLER_BACKEND:-openai}
+      CONTROLLER_TOKEN: ${LLM_WIZARD_CONTROLLER_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.6-terra}
+      OPENAI_REASONING_EFFORT: ${OPENAI_REASONING_EFFORT:-medium}
+      OPENAI_MAX_OUTPUT_TOKENS: ${OPENAI_MAX_OUTPUT_TOKENS:-12000}
+      OPENAI_TIMEOUT_SECONDS: ${OPENAI_TIMEOUT_SECONDS:-120}
+      OPENAI_MAX_RETRIES: ${OPENAI_MAX_RETRIES:-2}
+      QWEN_API_KEY: ${QWEN_API_KEY:-}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      QWEN_BASE_URL: ${QWEN_BASE_URL:-}
+      QWEN_MODEL: ${QWEN_MODEL:-qwen3.7-flash}
+      QWEN_MAX_OUTPUT_TOKENS: ${QWEN_MAX_OUTPUT_TOKENS:-4000}
+      QWEN_TIMEOUT_SECONDS: ${QWEN_TIMEOUT_SECONDS:-120}
+      QWEN_MAX_RETRIES: ${QWEN_MAX_RETRIES:-2}
+      QWEN_STAGE_TRANSPORT: ${QWEN_STAGE_TRANSPORT:-chat}
+    command:
+    - node
+    - src/server.js
+    ports:
+    - 127.0.0.1:${LLM_CONTROLLER_PORT:-9100}:9100
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - node -e "fetch('http://127.0.0.1:9100/health').then(r=>r.ok?r.json():Promise.reject()).then(d=>process.exit(d.configured==='true'?0:1)).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    profiles:
+    - llm
+  vision-service:
+    build:
+      context: ./vision-service
+    environment:
+      SIGLIP_MODEL: ${SIGLIP_MODEL:-google/siglip2-base-patch16-256}
+      SIGLIP_MODEL_REVISION: ${SIGLIP_MODEL_REVISION:-950d2cab84b57b9d6cf03f95596bfa8fed3204d3}
+      SIGLIP_SERVICE_TOKEN: ${SIGLIP_SERVICE_TOKEN:-}
+      SIGLIP_CONCEPT_ROOT: /app/concepts
+      SIGLIP_PRELOAD: ${SIGLIP_PRELOAD:-false}
+      V5_ENABLED: 'true'
+      RETRIEVAL_PRELOAD: 'true'
+      RETRIEVAL_GALLERY_ROOT: /gallery
+      RETRIEVAL_MAX_IMAGE_BYTES: 16777216
+      V5_ASSET_ROOT: /data/assets
+      PADDLE_PDX_CACHE_HOME: /models/paddlex
+      DINO_MODEL: ${DINO_MODEL:-IDEA-Research/grounding-dino-tiny}
+      DINO_MODEL_REVISION: ${DINO_MODEL_REVISION:-a2bb814dd30d776dcf7e30523b00659f4f141c71}
+      DINO_PRELOAD: ${DINO_PRELOAD:-false}
+      HF_HOME: /models/huggingface
+      HF_HUB_OFFLINE: '1'
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: '1'
+      V5_DINOV3_MODEL_DIR: /models/dinov3
+    ports:
+    - 127.0.0.1:${VISION_SERVICE_PORT:-9200}:9200
+    volumes:
+    - ${V5_HF_CACHE:-siglip-model-cache}:/models/huggingface
+    - ${V5_PADDLE_CACHE:-paddle-model-cache}:/models/paddlex
+    - ${V5_GALLERY_DIR:-./.runtime/v5-rc1}:/gallery:ro
+    - ./asset-store:/data/assets:ro
+    - type: bind
+      source: ${V5_DINOV3_MODEL_DIR:-./.runtime/models/dinov3-vitb16-5931719e67bbdb9737e363e781fb0c67687896bc}
+      target: /models/dinov3
+      read_only: true
+      bind:
+        create_host_path: false
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9200/ready',
+        timeout=5).read()"
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 300s
+    restart: unless-stopped
+    profiles:
+    - annotation
+  recognize:
+    build:
+      context: ./recognize-service
+      target: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      recognize-migrate:
+        condition: service_completed_successfully
+      vision-service:
+        condition: service_healthy
+      annotation-controller:
+        condition: service_healthy
+    user: ${HOST_UID:-1000}:${HOST_GID:-1000}
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Run
+        scripts/setup.py}@postgres:5432/${POSTGRES_DB:-wines}
+      HOST: 0.0.0.0
+      PORT: 4001
+      NEXT_BFF_ORIGIN: ${WEB_ORIGIN:-http://127.0.0.1:3000}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY:?Run scripts/setup.py}
+      ASSET_ROOT: /data/assets
+      DATASET_EXPORT_ROOT: /exports
+      WORKER_ENABLED: ${WORKER_ENABLED:-true}
+      WORKER_POLL_INTERVAL_MS: ${WORKER_POLL_INTERVAL_MS:-1000}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+      WORKER_HEARTBEAT_MS: ${WORKER_HEARTBEAT_MS:-15000}
+      WORKER_LEASE_MS: ${WORKER_LEASE_MS:-120000}
+      WORKER_REAPER_MS: ${WORKER_REAPER_MS:-30000}
+      V5_TIMEOUT_MS: ${V5_TIMEOUT_MS:-120000}
+      CV_DEBUG_ARTIFACTS: ${CV_DEBUG_ARTIFACTS:-false}
+      CV_OCR_ENABLED: ${CV_OCR_ENABLED:-false}
+      LOCAL_ML_CONTROLLER_URL: ${LOCAL_ML_CONTROLLER_URL:-http://annotation-controller:9000/annotation/plan}
+      LOCAL_ML_CONTROLLER_TOKEN: ${LOCAL_ML_CONTROLLER_TOKEN:-}
+      LOCAL_ML_CONTROLLER_TIMEOUT_MS: ${LOCAL_ML_CONTROLLER_TIMEOUT_MS:-60000}
+      LOCAL_ML_CONTROLLER_MAX_RESPONSE_BYTES: ${LOCAL_ML_CONTROLLER_MAX_RESPONSE_BYTES:-2097152}
+      LLM_WIZARD_CONTROLLER_URL: ${LLM_WIZARD_CONTROLLER_URL:-http://llm-controller:9100/annotation/plan}
+      LLM_WIZARD_CONTROLLER_TOKEN: ${LLM_WIZARD_CONTROLLER_TOKEN:-}
+      LLM_WIZARD_CONTROLLER_TIMEOUT_MS: ${LLM_WIZARD_CONTROLLER_TIMEOUT_MS:-150000}
+      LLM_WIZARD_CONTROLLER_MAX_RESPONSE_BYTES: ${LLM_WIZARD_CONTROLLER_MAX_RESPONSE_BYTES:-2097152}
+      LLM_WIZARD_PROVIDER: ${LLM_CONTROLLER_BACKEND:-openai}
+      LLM_WIZARD_MODEL: ${QWEN_MODEL:-qwen3.7-flash}
+      SIGLIP_ENABLED: ${SIGLIP_ENABLED:-false}
+      SIGLIP_LABEL_RERANK: ${SIGLIP_LABEL_RERANK:-true}
+      SIGLIP_REGION_PROPOSALS: ${SIGLIP_REGION_PROPOSALS:-false}
+      SIGLIP_MODE: ${SIGLIP_MODE:-off}
+      SIGLIP_SERVICE_URL: ${SIGLIP_SERVICE_URL:-http://vision-service:9200}
+      SIGLIP_SERVICE_TOKEN: ${SIGLIP_SERVICE_TOKEN:-}
+      SIGLIP_MODEL: ${SIGLIP_MODEL:-google/siglip2-base-patch16-256}
+      SIGLIP_MODEL_REVISION: ${SIGLIP_MODEL_REVISION:-950d2cab84b57b9d6cf03f95596bfa8fed3204d3}
+      SIGLIP_TIMEOUT_MS: ${SIGLIP_TIMEOUT_MS:-30000}
+      DINO_ENABLED: ${DINO_ENABLED:-false}
+      DINO_SERVICE_URL: ${DINO_SERVICE_URL:-http://vision-service:9200}
+      DINO_MODEL: ${DINO_MODEL:-IDEA-Research/grounding-dino-tiny}
+      DINO_MODEL_REVISION: ${DINO_MODEL_REVISION:-a2bb814dd30d776dcf7e30523b00659f4f141c71}
+      DINO_PROMPT: ${DINO_PROMPT:-main wine label}
+      DINO_THRESHOLD: ${DINO_THRESHOLD:-0.18}
+      DINO_TEXT_THRESHOLD: ${DINO_TEXT_THRESHOLD:-0.15}
+      DINO_TIMEOUT_MS: ${DINO_TIMEOUT_MS:-30000}
+    ports:
+    - 127.0.0.1:${RECOGNIZE_PORT:-4001}:4001
+    volumes:
+    - ./asset-store:/data/assets
+    - ./exports:/exports
+    - ./artifacts/ocr/eng.traineddata:/app/eng.traineddata:ro
+    - ./artifacts/ocr/rus.traineddata:/app/rus.traineddata:ro
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - node -e "fetch('http://127.0.0.1:4001/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    profiles:
+    - annotation
+  web:
+    build:
+      context: ./vinedetect_web
+      target: production
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-http://127.0.0.1:8000}
+        NEXT_PUBLIC_ACTIVITY_LOG_ENABLED: 'false'
+    depends_on:
+      api:
+        condition: service_healthy
+      core:
+        condition: service_healthy
+    environment:
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+      NEXT_PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-http://127.0.0.1:8000}
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://api:8000}
+      VINEDETECT_CORE_URL: http://core:8765
+      VINEDETECT_CORE_TIMEOUT_MS: ${VINEDETECT_CORE_TIMEOUT_MS:-60000}
+      RECOGNIZE_SERVICE_URL: http://recognize:4001
+      RECOGNIZE_INTERNAL_API_KEY: ${INTERNAL_API_KEY:?Run scripts/setup.py}
+      AUTH_JWT_SECRET: ${JWT_SECRET:?Run scripts/setup.py}
+      NEXT_ADMIN_ASSET_ROOT: /data/assets
+      DEV_ACTIVITY_LOG_ENABLED: 'false'
+      DEV_ACTIVITY_LOG_DIR: /logs/activity
+    ports:
+    - 127.0.0.1:${WEB_PORT:-3000}:3000
+    volumes:
+    - ./asset-store:/data/assets:ro
+    - ./.dev_logs:/logs
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - node -e "fetch('http://127.0.0.1:3000/admin').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    restart: unless-stopped
+  core:
+    image: ${CORE_IMAGE:-vinedetect-core:c4}
+    gpus: all
+    user: 1000:1000
+    read_only: true
+    cpus: 4
+    mem_limit: 6g
+    memswap_limit: 6g
+    tmpfs:
+    - /tmp:rw,nosuid,size=2g,mode=1777
+    - /audit:rw,nosuid,size=64m,mode=1777
+    working_dir: /release
+    environment:
+      PYTHONPATH: /engineering:/overlay:/release
+      PYTHONDONTWRITEBYTECODE: '1'
+      HF_HOME: /models/huggingface
+      HF_HUB_OFFLINE: '1'
+      TRANSFORMERS_OFFLINE: '1'
+      PADDLE_PDX_CACHE_HOME: /models/paddlex
+      V5_DINOV3_MODEL_DIR: /models/dinov3
+      TORCH_KERNEL_CACHE_PATH: /tmp/torch-kernels
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      SEM_ORG_RELEASE_ROOT: /release
+      ENGINEERING_LAYOUT: C4
+      ENGINEERING_CAPTURE: '0'
+    volumes:
+    - type: bind
+      source: ${CORE_RUNTIME_DIR:-./artifacts/core-runtime}
+      target: /release
+      read_only: true
+      bind:
+        create_host_path: false
+    - type: bind
+      source: ${CORE_RUNTIME_DIR:-./artifacts/core-runtime}/models
+      target: /models
+      read_only: true
+      bind:
+        create_host_path: false
+    - type: bind
+      source: ${CORE_RUNTIME_DIR:-./artifacts/core-runtime}/overlay
+      target: /overlay
+      read_only: true
+      bind:
+        create_host_path: false
+    - ./core/engineering:/engineering:ro
+    ports:
+    - 127.0.0.1:${CORE_PORT:-8765}:8765
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/ready',timeout=5)
+      interval: 15s
+      timeout: 10s
+      retries: 80
+      start_period: 120s
+    restart: unless-stopped
+volumes:
+  postgres-data: null
+  paddle-model-cache: null
+  siglip-model-cache: null

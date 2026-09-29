@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' file: data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'">
+<title>Field wine retrieval · human review</title>
+<style>
+:root{font:15px/1.5 system-ui,sans-serif;color:#e9e5df;background:#121916;color-scheme:dark}*{box-sizing:border-box}body{margin:0}header{padding:22px 30px 14px;border-bottom:1px solid #405148;background:#1c2721}h1{margin:0;font-size:25px}h2{font-size:19px;overflow-wrap:anywhere}p{margin:7px 0}.muted{color:#b8c4ba}.warning{color:#e9c685}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:15px 30px;background:#1c2721}button,select,input,textarea{font:inherit;background:#26362d;color:inherit;border:1px solid #758e7d;border-radius:5px;padding:7px}button{cursor:pointer}button:hover{background:#3c5345}button:focus-visible,a:focus-visible{outline:3px solid #f1c574}button:disabled{opacity:.4;cursor:default}a{color:#b7dcbd}label{display:inline-flex;gap:7px;align-items:center}main{padding:0 30px 25px}.workspace{display:grid;grid-template-columns:minmax(260px,32%) 1fr;gap:22px}.field{position:sticky;top:12px;align-self:start}.field img{width:100%;max-height:64vh;object-fit:contain;background:#fff;border-radius:6px}.candidates{display:grid;grid-template-columns:repeat(5,minmax(110px,1fr));gap:10px}.candidate{background:#223028;padding:10px;border:1px solid #45604e;border-radius:6px;overflow-wrap:anywhere}.candidate img{width:100%;height:245px;object-fit:contain;background:white;border-radius:3px}.candidate p{font-size:13px;line-height:1.4}.rank{display:flex;justify-content:space-between;font-weight:650}.candidate button{width:100%;font-size:13px;margin-top:8px}.slug{color:#bad3bd;font-size:12px!important}.review-form{padding:15px;background:#202c24;border:1px solid #607462;border-radius:6px;margin:18px 0}.review-form>label{display:flex;margin:10px 0;align-items:start;flex-wrap:wrap}.review-form input,.review-form textarea{flex:1;min-width:160px}.review-form textarea{width:100%;min-height:65px}.tags{display:flex;flex-wrap:wrap;gap:8px}.tags label{font-size:12px;background:#304235;padding:4px 8px;border-radius:4px}.tags input{min-width:0}.notice{padding:10px 30px;color:#f1c574;min-height:40px}details{margin-top:15px}summary{cursor:pointer;padding:8px;background:#293a30}details .candidates{margin-top:10px}#position{min-width:110px}.sub{font-size:12px}.field-id{overflow-wrap:anywhere;font-size:11px;color:#a7b9aa}@media(max-width:1200px){.candidates{grid-template-columns:repeat(3,minmax(110px,1fr))}}@media(max-width:760px){.workspace{display:block}.field{position:static}.candidates{grid-template-columns:repeat(2,minmax(110px,1fr))}header,.toolbar,main{padding:15px}.candidate img{height:200px}}
+</style></head><body>
+<header><h1>Field wine retrieval</h1><p class="muted">Human review · frozen SigLIP2 · 256 patches · exact cosine retrieval</p><p class="warning">Confidence/margin is diagnostic only and does not measure correctness. Candidates are suggestions, never ground truth.</p><p class="sub">Edits stay in this browser until you export JSON. Import the exported file with <code>import-field-labels</code> before evaluation. Original photos remain unchanged. Paired variants require separate human labels.</p><p id="group-summary" class="sub"></p></header>
+<div class="toolbar"><label>Images <select id="variants"><option value="primary">Primary only (original + standalone)</option><option value="all">All images (include thumbs)</option><option value="thumb">Thumbs only</option></select></label><label>Sort <select id="sort"><option value="filename">Original filename</option><option value="marginAsc">Lowest margin first</option><option value="marginDesc">Highest margin first</option><option value="scoreAsc">Lowest Top1 first</option><option value="scoreDesc">Highest Top1 first</option></select></label><label>Status <select id="filter"><option value="all">All statuses</option></select></label><button id="not-in-catalog">Not in catalog</button><label>Search <input id="search" placeholder="Filename, slug, winery"></label><button id="export">Export labels JSON</button><label>Import labels <input type="file" id="import" accept=".json,application/json" style="max-width:215px"></label></div>
+<div class="toolbar"><button id="prev">← Previous</button><span id="position"></span><button id="next">Next →</button><span id="progress" class="muted"></span></div><div id="notice" class="notice" role="status" aria-live="polite"></div><main id="main"></main>
+<script id="data" type="application/json">__FIELD_DATA__</script>
+<script>
+'use strict';
+const DATA=JSON.parse(document.getElementById('data').textContent), $=id=>document.getElementById(id);
+const clone=v=>JSON.parse(JSON.stringify(v)), catalog=new Map(DATA.catalog.map(r=>[r.catalog_item_id,r])), fieldIds=new Set(DATA.records.map(r=>r.field_image_id));
+const key='vinedetect-field-labels:'+DATA.labels.manifest_sha256;
+let labels=clone(DATA.labels), index=0, list=[], byId;
+function validate(doc){
+ if(doc.schema_version!==DATA.labels.schema_version||doc.dataset_type!=='field_real_world'||doc.manifest_sha256!==DATA.labels.manifest_sha256||doc.gallery_sha256!==DATA.labels.gallery_sha256)throw Error('Label schema or snapshot differs.');
+ if(!Array.isArray(doc.rows)||doc.rows.length!==fieldIds.size||new Set(doc.rows.map(r=>r.field_image_id)).size!==fieldIds.size)throw Error('Each field identity is required exactly once.');
+ for(const r of doc.rows){
+  if(!fieldIds.has(r.field_image_id)||!DATA.statuses.includes(r.status))throw Error('Unknown field identity or status.');
+  if(r.status==='exact_confirmed'){if(!Number.isInteger(r.catalog_item_id)||!catalog.has(r.catalog_item_id)||catalog.get(r.catalog_item_id).official_slug!==r.official_slug)throw Error('Exact ID/slug must match one gallery row.');}
+  else if(r.catalog_item_id!==null||r.official_slug!==null)throw Error('Only exact_confirmed can carry an exact target.');
+  if(!Array.isArray(r.candidate_catalog_ids)||new Set(r.candidate_catalog_ids).size!==r.candidate_catalog_ids.length||r.candidate_catalog_ids.some(id=>!Number.isInteger(id)||!catalog.has(id)))throw Error('Invalid candidate IDs.');
+  if(!Array.isArray(r.tags)||new Set(r.tags).size!==r.tags.length||r.tags.some(t=>!DATA.tags.includes(t)))throw Error('Invalid tags.');
+  if(r.note!==null&&typeof r.note!=='string')throw Error('Note must be text or null.');
+ }
+ return doc;
+}
+function notice(message){$('notice').textContent=message;}
+try{const stored=localStorage.getItem(key);if(stored){labels=validate(JSON.parse(stored));notice('Restored explicit review edits from this browser. Export JSON to preserve them.');}}catch(e){notice('Browser storage unavailable or invalid; export JSON before closing. '+e.message);}
+function mapLabels(){byId=new Map(labels.rows.map(r=>[r.field_image_id,r]));}
+mapLabels();
+function persist(){validate(labels);try{localStorage.setItem(key,JSON.stringify(labels));notice('Saved in this browser. Export JSON, then import it with the CLI to update the annotation file.');}catch(e){notice('Browser storage unavailable. Export JSON now to preserve edits.');}}
+function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+function inputLabel(text,control){const n=el('label',text);n.append(control);return n;}
+function candidateCard(c){const card=el('article',undefined,'candidate');card.append(el('div',`#${c.rank} · ${c.cosine_similarity.toFixed(5)}`,'rank'));const a=el('a');a.href=c.preview;a.target='_blank';a.rel='noopener';const img=el('img');img.src=c.preview;img.alt=`Reference ${c.official_slug}`;img.loading='lazy';a.append(img);card.append(a,el('p',c.title||'Title unavailable'),el('p',c.winery||c.manufacturer||'Winery unavailable'),el('p',`${c.catalog_item_id} · ${c.official_slug}`,'slug'));const pick=el('button','Choose this exact identity');pick.onclick=()=>{formStatus.value='exact_confirmed';formId.value=c.catalog_item_id;formId.dispatchEvent(new Event('input'));notice('Candidate selected in the form. Check the photo and click Save human decision to confirm.');};card.append(pick);return card;}
+let formStatus,formId;
+function variantVisible(r){const scope=$('variants').value;return scope==='all'||(scope==='primary'?r.variant!=='thumb':r.variant==='thumb');}
+function openPaired(fieldId){
+ $('variants').value='all';$('filter').value='all';$('search').value='';refresh();
+ index=list.findIndex(r=>r.field_image_id===fieldId);render();
+ notice('Opened paired variant. Its label is independent; no decision was copied.');
+}
+function refresh(reset=true){
+ const filter=$('filter').value, search=$('search').value.toLowerCase();
+ list=DATA.records.filter(r=>variantVisible(r)&&(filter==='all'||byId.get(r.field_image_id).status===filter)&&(!search||[r.filename,...r.top_10.flatMap(c=>[c.official_slug,c.title,c.winery,c.manufacturer])].join(' ').toLowerCase().includes(search)));
+ const mode=$('sort').value, cmp=(a,b)=>a<b?-1:a>b?1:0;
+ list.sort((a,b)=>{let value=0;if(mode==='filename')value=cmp(a.filename,b.filename);if(mode==='marginAsc')value=a.margin-b.margin;if(mode==='marginDesc')value=b.margin-a.margin;if(mode==='scoreAsc')value=a.top_1_score-b.top_1_score;if(mode==='scoreDesc')value=b.top_1_score-a.top_1_score;return value||cmp(a.field_image_id,b.field_image_id);});
+ if(reset)index=0;index=Math.min(index,Math.max(0,list.length-1));render();
+}
+function render(){
+ const main=$('main');main.replaceChildren();$('position').textContent=list.length?`${index+1} / ${list.length}`:'0 matches';$('prev').disabled=index===0;$('next').disabled=index>=list.length-1;
+ const scope=DATA.records.filter(variantVisible), reviewed=scope.filter(r=>byId.get(r.field_image_id).status!=='unreviewed').length, exact=scope.filter(r=>byId.get(r.field_image_id).status==='exact_confirmed').length;$('progress').textContent=`${reviewed} / ${scope.length} reviewed in image scope · ${exact} exact confirmed`;
+ if(!list.length){main.append(el('p','No matching photos.'));return;}
+ const r=list[index], decision=byId.get(r.field_image_id);main.append(el('h2',r.filename));
+ const workspace=el('div',undefined,'workspace'),left=el('section',undefined,'field'),right=el('section');
+ const original=el('a');original.href=r.original;original.target='_blank';original.rel='noopener';const img=el('img');img.src=r.preview;img.alt=`Field photo ${r.filename}`;original.append(img);left.append(original,el('p','Click photo to open the untouched original.','sub'),el('p',`Top1 ${r.top_1_score.toFixed(5)} · margin ${r.margin.toFixed(5)} · Top1−Top5 ${r.top_5_spread.toFixed(5)}`),el('p',r.field_image_id,'field-id'));
+ left.append(el('p',`Variant: ${r.variant}`),el('p',`Source group: ${r.source_group_id}`,'field-id'));
+ if(r.paired_field_image_id){
+  const paired=DATA.records.find(p=>p.field_image_id===r.paired_field_image_id);
+  const link=el('a',`Open paired ${paired.variant} file: ${paired.filename}`);link.href=paired.original;link.target='_blank';link.rel='noopener';
+  const reviewPair=el('button',`Review paired ${paired.variant}`);reviewPair.id='review-paired';reviewPair.onclick=()=>openPaired(paired.field_image_id);
+  left.append(el('p','Labels are independent for each variant.','sub'),link,el('p'),reviewPair);
+ }else if(r.variant==='thumb'){left.append(el('p','Orphan thumb: original is not present. Excluded from primary benchmark.','sub'));}
+ const cards=el('div',undefined,'candidates');r.top_10.slice(0,5).forEach(c=>cards.append(candidateCard(c)));right.append(cards);
+ const more=el('details');more.append(el('summary','Expand candidates 6–10'));const extras=el('div',undefined,'candidates');r.top_10.slice(5).forEach(c=>extras.append(candidateCard(c)));more.append(extras);right.append(more);
+ const form=el('form',undefined,'review-form');form.append(el('h2','Human decision'));
+ formStatus=el('select');DATA.statuses.forEach(s=>{const o=el('option',s);o.value=s;formStatus.append(o);});formStatus.value=decision.status;
+ formId=el('input');formId.type='number';formId.placeholder='Catalog ID (including targets outside Top10)';formId.value=decision.catalog_item_id??'';
+ const chosen=el('p','', 'muted');function describe(){const c=catalog.get(Number(formId.value));chosen.textContent=c?`${c.official_slug} · ${c.title||''}`:'No exact target selected';}formId.oninput=describe;describe();
+ const family=el('input');family.placeholder='Optional comma-separated candidate IDs';family.value=decision.candidate_catalog_ids.join(', ');
+ const note=el('textarea');note.value=decision.note??'';note.placeholder='Reviewer note';
+ form.append(inputLabel('Status',formStatus),inputLabel('Exact catalog ID',formId),chosen,inputLabel('Family/ambiguous candidates',family),inputLabel('Note',note));
+ const tags=el('div',undefined,'tags'),checks=[];DATA.tags.forEach(t=>{const check=el('input');check.type='checkbox';check.value=t;check.checked=decision.tags.includes(t);checks.push(check);tags.append(inputLabel(t,check));});form.append(tags);
+ const save=el('button','Save human decision');save.type='submit';save.style.marginTop='12px';form.append(save);
+ form.onsubmit=e=>{e.preventDefault();try{const status=formStatus.value,id=status==='exact_confirmed'?Number(formId.value):null,target=catalog.get(id);const updated={field_image_id:r.field_image_id,status,catalog_item_id:id,official_slug:status==='exact_confirmed'?(target?.official_slug??null):null,candidate_catalog_ids:family.value.trim()?family.value.split(',').map(s=>Number(s.trim())):[],note:note.value||null,tags:checks.filter(c=>c.checked).map(c=>c.value)};const next=clone(labels);next.rows=next.rows.map(row=>row.field_image_id===r.field_image_id?updated:row);validate(next);labels=next;mapLabels();persist();refresh(false);}catch(e){notice(e.message);}};
+ right.append(form);workspace.append(left,right);main.append(workspace);
+}
+DATA.statuses.forEach(s=>{const o=el('option',s);o.value=s;$('filter').append(o);});
+$('group-summary').textContent=`${DATA.grouping_summary.total_files} files · ${DATA.grouping_summary.source_groups} source groups · ${DATA.grouping_summary.primary_images} primary images · ${DATA.grouping_summary.thumb} thumbs`;
+$('variants').onchange=()=>refresh();$('not-in-catalog').onclick=()=>{$('filter').value='not_in_catalog';refresh();};
+$('sort').onchange=()=>refresh();$('filter').onchange=()=>refresh();$('search').oninput=()=>refresh();$('prev').onclick=()=>{index--;render();};$('next').onclick=()=>{index++;render();};
+$('export').onclick=()=>{try{validate(labels);const blob=new Blob([JSON.stringify(labels,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='field-labels.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notice('Exported saved human decisions. Unsaved form edits are not included. Import this file with the CLI before evaluation.');}catch(e){notice(e.message);}};
+$('import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;const imported=validate(JSON.parse(await file.text()));labels=imported;mapLabels();persist();refresh();}catch(e){notice('Import rejected: '+e.message);}finally{e.target.value='';}};
+refresh();
+</script></body></html>

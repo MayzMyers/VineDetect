@@ -1,0 +1,6 @@
+﻿ALTER TABLE wine_images
+    ADD COLUMN IF NOT EXISTS download_status TEXT,
+    ADD COLUMN IF NOT EXISTS download_error TEXT,
+    ADD COLUMN IF NOT EXISTS downloaded_at TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS content_type TEXT,
+    ADD COLUMN IF NOT EXISTS size_bytes BIGINT;

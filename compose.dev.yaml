@@ -1,0 +1,75 @@
+services:
+  api:
+    command:
+      - uvicorn
+      - app.api.application:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+    volumes:
+      - ./vinedetect_api:/app
+      - ./asset-store:/data/assets:ro
+    restart: "no"
+
+  recognize-migrate:
+    build:
+      target: development
+    command: ["npm", "run", "migrate"]
+    volumes:
+      - ./recognize-service:/app
+      - recognize-node-modules:/app/node_modules
+
+  recognize:
+    build:
+      target: development
+    command: ["npm", "run", "dev"]
+    environment:
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
+    volumes:
+      - ./recognize-service:/app
+      - recognize-node-modules:/app/node_modules
+      - ./asset-store:/data/assets
+    restart: "no"
+
+  annotation-controller:
+    command: ["npm", "run", "dev"]
+    volumes:
+      - ./annotation_controller:/app
+      - annotation-controller-node-modules:/app/node_modules
+    restart: "no"
+
+  llm-controller:
+    command: ["npm", "run", "dev"]
+    volumes:
+      - ./annotation_controller:/app
+      - annotation-controller-node-modules:/app/node_modules
+    restart: "no"
+
+  vision-service:
+    volumes:
+      - ./vision-service/app:/app/app
+      - ./vision-service/concepts:/app/concepts:ro
+      - siglip-model-cache:/models/huggingface
+    restart: "no"
+
+  web:
+    build:
+      target: development
+    command: ["npm", "run", "dev", "--", "--webpack", "--hostname", "0.0.0.0", "--port", "3000"]
+    environment:
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./vinedetect_web:/app
+      - web-node-modules:/app/node_modules
+      - web-next-cache:/app/.next
+      - ./asset-store:/data/assets:ro
+    restart: "no"
+
+volumes:
+  annotation-controller-node-modules:
+  recognize-node-modules:
+  web-node-modules:
+  web-next-cache:
+  siglip-model-cache:

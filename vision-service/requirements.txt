@@ -1,0 +1,13 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+pillow==12.3.0
+numpy==2.3.5
+transformers==5.17.0
+sentencepiece==0.2.0
+safetensors==0.8.0
+huggingface-hub==1.32.0
+paddleocr==3.7.0
+paddlex[ocr-core]==3.7.2
+# PaddleX pins this OpenCV wheel; avoid installing competing cv2 distributions.
+opencv-contrib-python==4.10.0.84
+protobuf==5.29.3

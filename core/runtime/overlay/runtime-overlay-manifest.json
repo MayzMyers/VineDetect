@@ -1,0 +1,19 @@
+{
+  "created_utc": "2026-09-28T22:23:33.286034+00:00",
+  "name": "R90-GATED-TEMPORARY-FRESH-CONFIRMATION",
+  "base_runtime": ".generated/final-endgame/rc1-organizer-real/runtime",
+  "base_runtime_manifest_sha256": "e6750cd1e7300c4c9beb3f256cbcb72f0d16fa0a3fbbda4de66ea745cda7900d",
+  "RC1_manifest_sha256": "d23de9496020a64b8494fa2871ad617ba6584fa0e35a15fc54b021732b2d5a26",
+  "preregistration_sha256": "dcbc59c3c2bf3e95e7a368b7c4c207d4bea3649e77a093ff1556927f452776db",
+  "saved_gate_receipt_sha256": "f4311cb541bd96e6a3f9a1398f805f12fd345a0cc08fb789e6d5307e1eb1abd4",
+  "files_sha256": {
+    "r90_support_rule.py": "05f0beaa6dab6cbbc5e490da83fb37371f67b5c36ce737916a82921cc673b9a3",
+    "gated_release.py": "0e061206d088f8c17441665b5e89243a50eb9b4fde97743fee92ad8e1ee9944e",
+    "r90_gate_pipeline.py": "fd7181bf4d2c2e05d4c3713832231f8b1e53bb8353d76e037e6dcdc49baea936"
+  },
+  "entrypoint": "gated_release.load_model(root)",
+  "base_entrypoint": "release_runtime.load_model(root) ordinary0 B",
+  "code_change": "Insert gate immediately after B label visual nominations and B pool construction, before geometry and all scoring. Everything outside this insertion remains byte-identical.",
+  "P_parallel_geometry_used": false,
+  "models_references_config_unchanged": true
+}

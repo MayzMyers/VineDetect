@@ -1,0 +1,111 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Node.js / frontend
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+
+# IDE
+.idea/
+.vscode/
+
+# Operating systems
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+.dev_logs/
+.probe_logs/
+
+# Local dataset snapshots and restored assets
+.basedata/
+data/
+!vinedetect_api/data/
+vinedetect_api/data/*
+!vinedetect_api/data/contest_reference_overrides/
+!vinedetect_api/data/contest_reference_overrides/**
+!vinedetect_api/data/contest_identity_corrections/
+!vinedetect_api/data/contest_identity_corrections/**
+!vinedetect_api/data/contest_metadata_overrides/
+!vinedetect_api/data/contest_metadata_overrides/**
+storage/
+svoe_vino/
+vinedetect_web/.asset-store/
+asset-store/
+
+# PostgreSQL local data
+**/postgres-data/
+**/postgres_data/
+**/pgdata/
+**/data/postgres/
+
+# Database dumps
+*.dump
+*.backup
+*.sql.gz
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Python package metadata
+**/*.egg-info/
+
+# Local datasets and generated artifacts
+exports/
+**/backups/
+**/data/images/
+**/logs/
+
+# Local AI/agent configuration
+**/.agents/
+
+# Local database/image snapshots
+backups/
+
+# Local static image storage
+/storage/images/
+
+# Local git worktrees
+.worktrees/
+
+# Versioned V5 runtime galleries (provisioned separately)
+.runtime/
+
+.generated/
+artifacts/
+core/runtime/models/
+core/runtime/assets/
+core/runtime/descriptor-arrays/
+core/runtime/gallery/
+*.tsbuildinfo
+
+/vinedetect_api/data/**
+!/vinedetect_api/data/
+!/vinedetect_api/data/*/
+!/vinedetect_api/data/*/.gitkeep
+**/tests/fixtures/
+/vinedetect_web/public/assets/
+/artifacts/
+*.traineddata
+
+/asset-store
+/artifacts

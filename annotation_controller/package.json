@@ -1,0 +1,16 @@
+{
+  "name": "vinedetect-annotation-controller",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test tests/*.test.js",
+    "check": "node --check src/server.js && node --check src/llm-planner.js && node --check src/stage-planner.js && node --check src/stage-decision.js && node --check src/deterministic-planner.js"
+  },
+  "dependencies": {
+    "fastify": "^5.6.2",
+    "openai": "^6.0.0"
+  }
+}

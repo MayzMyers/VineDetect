@@ -1,0 +1,38 @@
+{
+  "name": "recognize-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "migrate": "tsx src/db/migrate.ts",
+    "backfill:annotations": "tsx src/db/backfill-annotations.ts",
+    "probe:annotation-workflow": "tsx src/db/probe-annotation-workflow.ts",
+    "probe:controller-flow": "tsx src/db/probe-controller-flow.ts",
+    "probe:quad-roundtrip": "tsx src/db/probe-quad-roundtrip.ts",
+    "export:annotation-dataset": "tsx src/db/export-label-dataset.ts",
+    "export:label-dataset": "tsx src/db/export-label-dataset.ts",
+    "test": "tsx --test src/openapi/*.test.ts src/modules/training/*.test.ts src/modules/label-analysis/*.test.ts src/modules/ocr/*.test.ts src/modules/recognize-node/*.test.ts src/modules/source-analysis/*.test.ts src/modules/wizard/*.test.ts src/modules/contest-official/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "preflight:contest-official": "tsx src/db/preflight-contest-official.ts",
+    "autodetect:contest-official": "tsx src/modules/contest-official/autodetect.cli.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/swagger": "^9.8.1",
+    "@fastify/swagger-ui": "^6.1.1",
+    "fastify": "^5.6.2",
+    "pg": "^8.16.3",
+    "sharp": "^0.35.3",
+    "tesseract.js": "^7.0.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.9",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  }
+}

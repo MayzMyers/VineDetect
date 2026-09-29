@@ -1,0 +1,14 @@
+* text=auto
+
+*.py text eol=lf
+*.sql text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.example text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+
+# Frozen Core files are byte-pinned; do not normalize line endings.
+core/** -text

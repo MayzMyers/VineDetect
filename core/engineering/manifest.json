@@ -1,0 +1,20 @@
+{
+  "created_utc": "2026-09-29T12:24:11.442221+00:00",
+  "preregistration_sha256": "1a8638c3cb54f568e123d59e55854940da753da28ea9430808f7a70ce812543e",
+  "parent_sha256": "c19d39d4947a98f768cce0619e17ed686bc2b7dbf9edfcd2b721b39103612fae",
+  "files_sha256": {
+    "baseline_audit.py": "13f5bf90a1adc6e833950a8c998859832dd6e26bb28e64c2479eb457abc6abeb",
+    "engineering.py": "30232ac452b0759478926ce08cf30a8ced7715be15d6db39ad2b2d51f7389767",
+    "engineering_pipeline.py": "3751fbb0b9495bb79b66f1c2bc99bcb1e573d4cafbb466b958e1fc6c9a5654cc",
+    "engineering_service.py": "63275fca79d91b02ff7e5b454c35b2b6f93168da9b230aca9a79051042255686",
+    "resource_monitor.py": "8bbc6d83a4e407fe9b41e241e7c182aaf14e88d6c799700c82cc9cc64d7b6114"
+  },
+  "driver_sha256": "1d6dff24977b6f60655074c0462ec7dba16f70c95d035f03a8ec03c797f745fa",
+  "layouts": [
+    "C4",
+    "C2P"
+  ],
+  "pretest_audit_strengthening": "Explicit catalog ID -> sealed descriptor key -> loaded object hashes; verify engineering source hashes at startup; no inference or latency result collected before revision",
+  "H_memory_amendment_sha256": "d0ecd11e6a8ff3dbff05091ad5c2571bd4f61cb66ad48f97f4db59ab8c4767f5",
+  "H_native_fallback_sha256": "3ecdbd70ca5f8414c294912ab87e602c4fb89f28a16e1e25a0d569a31ea45c4b"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "wine-label-v1",
+  "version": 1,
+  "negativeWeight": 0.65,
+  "positive": [
+    { "id": "wine_label", "text": "a wine bottle label" },
+    { "id": "printed_wine_label", "text": "a printed wine label" },
+    { "id": "front_label", "text": "the front label of a wine bottle" },
+    { "id": "attached_product_label", "text": "a product label attached to a bottle" }
+  ],
+  "negative": [
+    { "id": "bottle_neck", "text": "the neck of a wine bottle" },
+    { "id": "bottle_body", "text": "a bottle without a label" },
+    { "id": "background", "text": "background behind a bottle" },
+    { "id": "shelf", "text": "a table or shelf" },
+    { "id": "bottle_cap", "text": "a bottle cap" },
+    { "id": "glass_surface", "text": "glass surface" }
+  ]
+}

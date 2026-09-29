@@ -1,0 +1,144 @@
+{
+  "schema_version": "contest-training-relationships/1",
+  "contest_version": "lct-rshb-2026-09-15",
+  "relationships": [
+    {
+      "type": "visual_equivalent_or_vintage",
+      "catalog_item_ids": [
+        2,
+        676
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "visual_equivalent_or_vintage",
+      "catalog_item_ids": [
+        152,
+        153
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "visual_equivalent_or_vintage",
+      "catalog_item_ids": [
+        675,
+        678
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "visual_equivalent_or_vintage",
+      "catalog_item_ids": [
+        720,
+        721
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "visual_equivalent_or_vintage",
+      "catalog_item_ids": [
+        857,
+        858
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "visual_equivalent_or_vintage",
+      "catalog_item_ids": [
+        1154,
+        1155
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "visual_equivalent_or_vintage",
+      "catalog_item_ids": [
+        1645,
+        1646
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_alias_or_version",
+      "catalog_item_ids": [
+        1775,
+        2050
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_alias_or_version",
+      "catalog_item_ids": [
+        259,
+        1588
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_packaging_variant",
+      "catalog_item_ids": [
+        987,
+        988
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_packaging_variant",
+      "catalog_item_ids": [
+        990,
+        991
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_packaging_variant",
+      "catalog_item_ids": [
+        994,
+        995
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_packaging_variant",
+      "catalog_item_ids": [
+        1839,
+        1840
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_packaging_variant",
+      "catalog_item_ids": [
+        1841,
+        1842
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_packaging_variant",
+      "catalog_item_ids": [
+        1844,
+        1845
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "same_product_packaging_variant",
+      "catalog_item_ids": [
+        1847,
+        1848
+      ],
+      "provenance": "human_reviewed_dq2"
+    },
+    {
+      "type": "non_discriminative_reference_group",
+      "catalog_item_ids": [
+        1842,
+        1843,
+        1848
+      ],
+      "provenance": "human_reviewed_dq2"
+    }
+  ],
+  "historical_image_exclusions": []
+}

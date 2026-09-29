@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "version": "synthetic-example-v1",
+  "generatedAt": "2026-09-29T00:00:00Z",
+  "items": [
+    {
+      "catalogKey": "svoe_vino:example-white",
+      "displayTitle": "Example white wine",
+      "producer": "Example winery",
+      "metadata": {
+        "region": "Example region",
+        "color": "white",
+        "grapes": [
+          "Example grape"
+        ]
+      },
+      "tags": [
+        {
+          "value": "EXAMPLE WHITE",
+          "weight": 1.0,
+          "source": "catalog"
+        }
+      ]
+    },
+    {
+      "catalogKey": "svoe_vino:example-red",
+      "displayTitle": "Example red wine",
+      "producer": "Example winery",
+      "metadata": {
+        "region": "Example region",
+        "color": "red",
+        "grapes": [
+          "Example grape"
+        ]
+      },
+      "tags": [
+        {
+          "value": "EXAMPLE RED",
+          "weight": 1.0,
+          "source": "catalog"
+        }
+      ]
+    }
+  ]
+}
