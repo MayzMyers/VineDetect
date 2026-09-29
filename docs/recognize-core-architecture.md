@@ -1,3 +1,4 @@
+<img width="3878" height="3402" alt="mermaid-diagram" src="https://github.com/user-attachments/assets/9864eb01-081b-4407-b358-d689814b10c9" />
 # Архитектура VineDetect Core
 
 ## 1. Назначение
